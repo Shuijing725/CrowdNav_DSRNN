@@ -339,7 +339,7 @@ class CrowdSim(gym.Env):
 
     # Generates group of circum_num humans in a circle formation at a random viable location
     def generate_circle_group_obstacle(self, circum_num):
-        group_circumference = self.config.getfloat('humans', 'radius') * 2 * circum_num
+        group_circumference = self.config.humans.radius * 2 * circum_num
         # print("group circum: ", group_circumference)
         group_radius = group_circumference / (2 * np.pi)
         # print("group radius: ", group_radius)
@@ -350,7 +350,7 @@ class CrowdSim(gym.Env):
             for i, group in enumerate(self.circle_groups):
                 # print(i)
                 dist_between_groups = np.sqrt((rand_cen_x - group[1]) ** 2 + (rand_cen_y - group[2]) ** 2)
-                sum_radius = group_radius + group[0] + 2 * self.config.getfloat('humans', 'radius')
+                sum_radius = group_radius + group[0] + 2 * self.config.humans.radius
                 if dist_between_groups < sum_radius:
                     success = False
                     break
@@ -556,7 +556,7 @@ class CrowdSim(gym.Env):
 
         return ob
 
-    
+
     # Update the humans' end goals in the environment
     # Produces valid end goals for each human
     def update_human_goals_randomly(self):
@@ -618,7 +618,7 @@ class CrowdSim(gym.Env):
             # Update human's v_pref now that it's reached goal
             if self.random_v_pref:
                 human.v_pref += np.random.uniform(-0.1, 0.1)
-            
+
 
             while True:
                 angle = np.random.random() * np.pi * 2
