@@ -13,10 +13,8 @@ We train our network with model-free deep reinforcement learning without any exp
 We demonstrate that our model outperforms previous methods in challenging crowd navigation scenarios. 
 We successfully transfer the policy learned in the simulator to a real-world TurtleBot 2i.
 
-<!--
-## Method Overview
-<img src="https://i.imgur.com/YOPHXD1.png" width="1000" />
--->
+<img src="/figures/open.jpg" width="600" />
+
 
 ## Setup
 1. Install the required python package
@@ -45,8 +43,19 @@ Details of the simulation framework can be found
 [here](crowd_sim/README.md). Below are the instructions for training and testing policies.
 
 ### Change configurations
-1. Environment configurations: modify crowd_nav/configs/env.config
-3. PPO configurations: modify arguments.py 
+1. Environment configurations: modify `crowd_nav/configs/env.config`
+- For FoV environment (left in the figure below): change the value of `robot.FOV`
+- For Group environment (right in the figure below): set `sim.group_human` to `True`
+<div class="row">
+  <div class="column">
+    <img src="/figures/FOV_env.png" width="350" />
+  </div>
+  <div class="column">
+    <img src="/figures/group_env.png" width="350" />
+  </div>
+</div>
+
+2. PPO configurations: modify arguments.py 
 
 ### Run the code
 1. Train a policy. 
