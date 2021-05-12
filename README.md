@@ -13,7 +13,7 @@ We train our network with model-free deep reinforcement learning without any exp
 We demonstrate that our model outperforms previous methods in challenging crowd navigation scenarios. 
 We successfully transfer the policy learned in the simulator to a real-world TurtleBot 2i.
 
-<img src="/figures/open.jpg" width="600" />
+<img src="/figures/open.jpg" width="450" />
 
 
 ## Setup
@@ -46,14 +46,9 @@ Details of the simulation framework can be found
 1. Environment configurations: modify `crowd_nav/configs/env.config`
 - For FoV environment (left in the figure below): change the value of `robot.FOV`
 - For Group environment (right in the figure below): set `sim.group_human` to `True`
-<div class="row">
-  <div class="column">
-    <img src="/figures/FOV_env.png" width="350" />
-  </div>
-  <div class="column">
-    <img src="/figures/group_env.png" width="350" />
-  </div>
-</div>
+<img src="/figures/FOV_env.png" width="250" />
+<img src="/figures/group_env.png" width="250" />
+
 
 2. PPO configurations: modify arguments.py 
 
@@ -76,8 +71,8 @@ python plot.py
 ## Learning Curve
 Learning curves of DS-RNN in 360 degrees FoV environment with 5 humans.
 
-<img src="/figures/reward.png" width="600" />
-<img src="/figures/loss.png" width="600" />
+<img src="/figures/reward.png" width="450" />
+<img src="/figures/loss.png" width="450" />
 
 ## Citation
 If you find the code or the paper useful for your research, please cite our paper:
