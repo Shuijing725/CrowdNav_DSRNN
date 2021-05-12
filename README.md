@@ -46,8 +46,8 @@ Details of the simulation framework can be found
 1. Environment configurations: modify `crowd_nav/configs/env.config`
 - For FoV environment (left in the figure below): change the value of `robot.FOV`
 - For Group environment (right in the figure below): set `sim.group_human` to `True`
-<img src="/figures/FOV_env.png" width="250" />
-<img src="/figures/group_env.png" width="250" />
+
+<img src="/figures/FOV_env.png" height="270" /> <img src="/figures/group_env.png" height="270" />
 
 
 2. PPO configurations: modify arguments.py 
