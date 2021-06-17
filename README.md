@@ -1,6 +1,6 @@
 # DSRNN_CrowdNav
 This repository contains the codes for our paper titled "Decentralized Structural-RNN for Robot Crowd Navigation with Deep Reinforcement Learning" in ICRA 2021. 
-For more details, please refer to the 
+For more details, please refer to the [project website](https://sites.google.com/illinois.edu/crowdnav-dsrnn/home) and 
 [arXiv preprint](https://arxiv.org/abs/2011.04820).
 For experiment demonstrations, please refer to the [youtube video](https://youtu.be/bYO-1IAjzgY).
 
@@ -77,15 +77,21 @@ Learning curves of DS-RNN in 360 degrees FoV environment with 5 humans.
 ## Citation
 If you find the code or the paper useful for your research, please cite our paper:
 ```
-@misc{liu2020decentralized,
+@inproceedings{liu2020decentralized,
   title={Decentralized Structural-RNN for Robot Crowd Navigation with Deep Reinforcement Learning},
   author={Liu, Shuijing and Chang, Peixin and Liang, Weihang and Chakraborty, Neeloy and Driggs-Campbell, Katherine},
-  eprint={arXiv preprint arXiv:2011.04820},
-  year={2020}
+  booktitle={International Conference on Robotics and Automation (ICRA)},
+  year={2021}
 }
 ```
 
-## References
+## Credits
+Other contributors:  
+[Peixin Chang](https://github.com/PeixinC)  
+[Neeloy Chakraborty](https://github.com/TheNeeloy)  
+
+Part of the code is based on the following repositories:  
+
 [1] C. Chen, Y. Liu, S. Kreiss, and A. Alahi, “Crowd-robot interaction: Crowd-aware robot navigation with attention-based deep reinforcement learning,” in International Conference on Robotics and Automation (ICRA), 2019, pp. 6015–6022.
 (Github: https://github.com/vita-epfl/CrowdNav)
 
