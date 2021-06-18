@@ -5,8 +5,6 @@ import torch
 
 def get_args():
     parser = argparse.ArgumentParser(description='RL')
-    parser.add_argument(
-        '--env_config', type=str, default='crowd_nav/configs/env.config')
 
     # the saving directory for train.py
     parser.add_argument(
