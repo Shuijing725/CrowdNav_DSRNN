@@ -18,9 +18,6 @@ class CrowdSimDict(CrowdSim):
 
         self.desiredVelocity=[0.0,0.0]
 
-        self.last_left = 0.
-        self.last_right = 0.
-
 
 
     def set_robot(self, robot):
@@ -49,9 +46,7 @@ class CrowdSimDict(CrowdSim):
         visible_humans, num_visibles, human_visibility = self.get_num_human_in_fov()
         visible_obs, num_visible_obs, _ = self.get_num_human_in_fov()
 
-        ob['robot_node'] = [] # [num_visibles]
-        robotS = np.array(self.robot.get_full_state_list_noV())
-        ob['robot_node'].extend(list(robotS))
+        ob['robot_node'] = self.robot.get_full_state_list_noV()
 
 
         self.update_last_human_states(human_visibility, reset=reset)
@@ -117,12 +112,6 @@ class CrowdSimDict(CrowdSim):
         if self.random_policy_changing:
             self.randomize_human_policies()
 
-
-        for agent in [self.robot] + self.humans:
-            agent.time_step = self.time_step
-            agent.policy.time_step = self.time_step
-
-
         # case size is used to make sure that the case_counter is always between 0 and case_size[phase]
         self.case_counter[phase] = (self.case_counter[phase] + int(1*self.nenv)) % self.case_size[phase]
 
@@ -131,10 +120,6 @@ class CrowdSimDict(CrowdSim):
 
         # initialize potential
         self.potential = -abs(np.linalg.norm(np.array([self.robot.px, self.robot.py]) - np.array([self.robot.gx, self.robot.gy])))
-
-
-        self.last_left = 0.
-        self.last_right = 0.
 
 
         return ob
@@ -151,38 +136,7 @@ class CrowdSimDict(CrowdSim):
             action=ActionRot(self.desiredVelocity[0], action.r)
 
 
-        human_actions = [] # a list of all humans' actions
-        for i, human in enumerate(self.humans):
-            # observation for humans is always coordinates
-            ob = []
-            for other_human in self.humans:
-                if other_human != human:
-                    # Chance for one human to be blind to some other humans
-                    if self.random_unobservability and i == 0:
-                        if np.random.random() <= self.unobservable_chance or not self.detect_visible(human, other_human):
-                            ob.append(self.dummy_human.get_observable_state())
-                        else:
-                            ob.append(other_human.get_observable_state())
-                    # Else detectable humans are always observable to each other
-                    elif self.detect_visible(human, other_human):
-                        ob.append(other_human.get_observable_state())
-                    else:
-                        ob.append(self.dummy_human.get_observable_state())
-
-            if self.robot.visible:
-                # Chance for one human to be blind to robot
-                if self.random_unobservability and i == 0:
-                    if np.random.random() <= self.unobservable_chance or not self.detect_visible(human, self.robot):
-                        ob += [self.dummy_robot.get_observable_state()]
-                    else:
-                        ob += [self.robot.get_observable_state()]
-                # Else human will always see visible robots
-                elif self.detect_visible(human, self.robot):
-                    ob += [self.robot.get_observable_state()]
-                else:
-                    ob += [self.dummy_robot.get_observable_state()]
-
-            human_actions.append(human.act(ob))
+        human_actions = self.get_human_actions()
 
         # compute reward and episode info
         reward, done, episode_info = self.calc_reward(action)

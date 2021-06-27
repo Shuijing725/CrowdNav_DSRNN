@@ -29,7 +29,8 @@ class Agent(object):
         self.vx = None
         self.vy = None
         self.theta = None
-        self.time_step = None
+        self.time_step = config.env.time_step
+        self.policy.time_step = config.env.time_step
 
 
     def print_info(self):

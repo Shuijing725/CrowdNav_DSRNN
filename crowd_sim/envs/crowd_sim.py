@@ -1,7 +1,6 @@
 import logging
 import gym
 import numpy as np
-import rvo2
 import random
 
 
@@ -129,7 +128,6 @@ class CrowdSim(gym.Env):
         self.dummy_robot.kinematics = 'holonomic'
         self.dummy_robot.policy = ORCA(config)
 
-        self.r = self.config.humans.radius
 
 
         # configure noise in state
@@ -538,11 +536,6 @@ class CrowdSim(gym.Env):
             self.randomize_human_policies()
 
 
-        for agent in [self.robot] + self.humans:
-            agent.time_step = self.time_step
-            agent.policy.time_step = self.time_step
-
-
         # case size is used to make sure that the case_counter is always between 0 and case_size[phase]
         self.case_counter[phase] = (self.case_counter[phase] + int(1*self.nenv)) % self.case_size[phase]
 
@@ -825,17 +818,9 @@ class CrowdSim(gym.Env):
 
         return ob
 
-
-    def step(self, action, update=True):
-        """
-        Compute actions for all agents, detect collision, update environment and return (ob, reward, done, info)
-        """
-
-        # clip the action to obey robot's constraint
-        action = self.robot.policy.clip_action(action, self.robot.v_pref)
-
+    def get_human_actions(self):
         # step all humans
-        human_actions = [] # a list of all humans' actions
+        human_actions = []  # a list of all humans' actions
         for i, human in enumerate(self.humans):
             # observation for humans is always coordinates
             ob = []
@@ -843,7 +828,8 @@ class CrowdSim(gym.Env):
                 if other_human != human:
                     # Chance for one human to be blind to some other humans
                     if self.random_unobservability and i == 0:
-                        if np.random.random() <= self.unobservable_chance or not self.detect_visible(human, other_human):
+                        if np.random.random() <= self.unobservable_chance or not self.detect_visible(human,
+                                                                                                     other_human):
                             ob.append(self.dummy_human.get_observable_state())
                         else:
                             ob.append(other_human.get_observable_state())
@@ -867,6 +853,18 @@ class CrowdSim(gym.Env):
                     ob += [self.dummy_robot.get_observable_state()]
 
             human_actions.append(human.act(ob))
+        return human_actions
+
+    def step(self, action, update=True):
+        """
+        Compute actions for all agents, detect collision, update environment and return (ob, reward, done, info)
+        """
+
+        # clip the action to obey robot's constraint
+        action = self.robot.policy.clip_action(action, self.robot.v_pref)
+
+        # step all humans
+        human_actions = self.get_human_actions()
 
 
         # compute reward and episode info
@@ -968,29 +966,30 @@ class CrowdSim(gym.Env):
 
         # draw FOV for the robot
         # add robot FOV
-        FOVAng = self.robot_fov / 2
-        FOVLine1 = mlines.Line2D([0, 0], [0, 0], linestyle='--')
-        FOVLine2 = mlines.Line2D([0, 0], [0, 0], linestyle='--')
+        if self.robot_fov < np.pi * 2:
+            FOVAng = self.robot_fov / 2
+            FOVLine1 = mlines.Line2D([0, 0], [0, 0], linestyle='--')
+            FOVLine2 = mlines.Line2D([0, 0], [0, 0], linestyle='--')
 
 
-        startPointX = robotX
-        startPointY = robotY
-        endPointX = robotX + radius * np.cos(robot_theta)
-        endPointY = robotY + radius * np.sin(robot_theta)
+            startPointX = robotX
+            startPointY = robotY
+            endPointX = robotX + radius * np.cos(robot_theta)
+            endPointY = robotY + radius * np.sin(robot_theta)
 
-        # transform the vector back to world frame origin, apply rotation matrix, and get end point of FOVLine
-        # the start point of the FOVLine is the center of the robot
-        FOVEndPoint1 = calcFOVLineEndPoint(FOVAng, [endPointX - startPointX, endPointY - startPointY], 20. / self.robot.radius)
-        FOVLine1.set_xdata(np.array([startPointX, startPointX + FOVEndPoint1[0]]))
-        FOVLine1.set_ydata(np.array([startPointY, startPointY + FOVEndPoint1[1]]))
-        FOVEndPoint2 = calcFOVLineEndPoint(-FOVAng, [endPointX - startPointX, endPointY - startPointY], 20. / self.robot.radius)
-        FOVLine2.set_xdata(np.array([startPointX, startPointX + FOVEndPoint2[0]]))
-        FOVLine2.set_ydata(np.array([startPointY, startPointY + FOVEndPoint2[1]]))
+            # transform the vector back to world frame origin, apply rotation matrix, and get end point of FOVLine
+            # the start point of the FOVLine is the center of the robot
+            FOVEndPoint1 = calcFOVLineEndPoint(FOVAng, [endPointX - startPointX, endPointY - startPointY], 20. / self.robot.radius)
+            FOVLine1.set_xdata(np.array([startPointX, startPointX + FOVEndPoint1[0]]))
+            FOVLine1.set_ydata(np.array([startPointY, startPointY + FOVEndPoint1[1]]))
+            FOVEndPoint2 = calcFOVLineEndPoint(-FOVAng, [endPointX - startPointX, endPointY - startPointY], 20. / self.robot.radius)
+            FOVLine2.set_xdata(np.array([startPointX, startPointX + FOVEndPoint2[0]]))
+            FOVLine2.set_ydata(np.array([startPointY, startPointY + FOVEndPoint2[1]]))
 
-        ax.add_artist(FOVLine1)
-        ax.add_artist(FOVLine2)
-        artists.append(FOVLine1)
-        artists.append(FOVLine2)
+            ax.add_artist(FOVLine1)
+            ax.add_artist(FOVLine2)
+            artists.append(FOVLine1)
+            artists.append(FOVLine2)
 
         # add humans and change the color of them based on visibility
         human_circles = [plt.Circle(human.get_position(), human.radius, fill=False) for human in self.humans]
@@ -1005,11 +1004,13 @@ class CrowdSim(gym.Env):
                 human_circles[i].set_color(c='g')
             else:
                 human_circles[i].set_color(c='r')
+            plt.text(self.humans[i].px - 0.1, self.humans[i].py - 0.1, str(i), color='black', fontsize=12)
 
 
         plt.pause(0.1)
         for item in artists:
             item.remove() # there should be a better way to do this. For example,
             # initially use add_artist and draw_artist later on
-
+        for t in ax.texts:
+            t.set_visible(False)
 
