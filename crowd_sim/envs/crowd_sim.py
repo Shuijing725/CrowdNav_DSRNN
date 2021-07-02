@@ -785,14 +785,14 @@ class CrowdSim(gym.Env):
             # add a rotational penalty
             # if action.r is w, factor = -0.02 if w in [-1.5, 1.5], factor = -0.045 if w in [-1, 1];
             # if action.r is delta theta, factor = -2 if r in [-0.15, 0.15], factor = -4.5 if r in [-0.1, 0.1]
-            r_spin = -5 * action.r**2
+            r_spin = -2 * action.r**2
 
             # add a penalty for going backwards
             if action.v < 0:
                 r_back = -2 * abs(action.v)
             else:
                 r_back = 0.
-
+            # print(reward, r_spin, r_back)
             reward = reward + r_spin + r_back
 
         return reward, done, episode_info

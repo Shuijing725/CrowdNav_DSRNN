@@ -58,10 +58,13 @@ Details of the simulation framework can be found
 python train.py 
 ```
 
-2. Test policies.
+2. Test policies.   
+There are two example model weights for each type of robot kinematics:  
+`data/example_model/checkpoints/27776.pt` and `data/example_model_unicycle/checkpoints/55554.pt`.
 ```
 python test.py 
 ```
+
 3. Plot training curve.
 ```
 python plot.py

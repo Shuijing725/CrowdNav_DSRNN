@@ -8,8 +8,11 @@ import numpy as np
 legends = ['DS-RNN FoV=360', '']
 
 # change the folder directories here!
-logs1 = pd.read_csv("crowd_nav/data/dammy/progress.csv")
-# logs2 = pd.read_csv("crowd_nav/data/lstm_attn_360/progress.csv")
+# for holonomic weight
+logs1 = pd.read_csv("data/example_model/progress.csv")
+# for the unicycle weight
+# logs1 = pd.read_csv("data/example_model_unicycle/progress.csv")
+
 #3:logs3, 4:logs4, 5:logs5, 6:logs6, 7:logs7, ,9:logs9
 logDicts={1:logs1} # 1:logs1, 2:logs2, 3:logs3, 4:logs4, 5:logs5}
 graphDicts={0:'eprewmean', 1:'loss/value_loss'}
