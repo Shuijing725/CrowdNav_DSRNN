@@ -69,7 +69,7 @@ python test.py
 ```
 python plot.py
 ```
-(We only tested our code in Ubuntu 16.04 and 18.07 with Python 3.6.)
+(We only tested our code in Ubuntu 16.04 and 18.04 with Python 3.6.)
 
 ## Learning Curve
 Learning curves of DS-RNN in 360 degrees FoV environment with 5 humans.

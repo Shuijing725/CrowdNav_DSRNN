@@ -7,16 +7,16 @@ from pytorchBaselines.a2c_ppo_acktr.utils import init
 
 class RNNBase(nn.Module):
     # edge: True -> edge RNN, False -> node RNN
-    def __init__(self, args, edge):
+    def __init__(self, config, edge):
         super(RNNBase, self).__init__()
-        self.args = args
+        self.config = config
 
         # if this is an edge RNN
         if edge:
-            self.gru = nn.GRU(args.human_human_edge_embedding_size, args.human_human_edge_rnn_size)
+            self.gru = nn.GRU(config.SRNN.human_human_edge_embedding_size, config.SRNN.human_human_edge_rnn_size)
         # if this is a node RNN
         else:
-            self.gru = nn.GRU(args.human_node_embedding_size*2, args.human_node_rnn_size)
+            self.gru = nn.GRU(config.SRNN.human_node_embedding_size*2, config.SRNN.human_node_rnn_size)
 
         for name, param in self.gru.named_parameters():
             if 'bias' in name:
@@ -103,23 +103,23 @@ class HumanNodeRNN(RNNBase):
     '''
     Class representing human Node RNNs in the st-graph
     '''
-    def __init__(self, args):
+    def __init__(self, config):
         '''
         Initializer function
         params:
         args : Training arguments
         infer : Training or test time (True at test time)
         '''
-        super(HumanNodeRNN, self).__init__(args, edge=False)
+        super(HumanNodeRNN, self).__init__(config, edge=False)
 
-        self.args = args
+        self.config = config
 
         # Store required sizes
-        self.rnn_size = args.human_node_rnn_size
-        self.output_size = args.human_node_output_size
-        self.embedding_size = args.human_node_embedding_size
-        self.input_size = args.human_node_input_size
-        self.edge_rnn_size = args.human_human_edge_rnn_size
+        self.rnn_size = config.SRNN.human_node_rnn_size
+        self.output_size = config.SRNN.human_node_output_size
+        self.embedding_size = config.SRNN.human_node_embedding_size
+        self.input_size = config.SRNN.human_node_input_size
+        self.edge_rnn_size = config.SRNN.human_human_edge_rnn_size
 
         # Linear layer to embed input
         self.encoder_linear = nn.Linear(self.input_size, self.embedding_size)
@@ -172,21 +172,21 @@ class HumanHumanEdgeRNN(RNNBase):
     '''
     Class representing the Human-Human Edge RNN in the s-t graph
     '''
-    def __init__(self, args):
+    def __init__(self, config):
         '''
         Initializer function
         params:
         args : Training arguments
         infer : Training or test time (True at test time)
         '''
-        super(HumanHumanEdgeRNN, self).__init__(args, edge=True)
+        super(HumanHumanEdgeRNN, self).__init__(config, edge=True)
 
-        self.args = args
+        self.config = config
 
         # Store required sizes
-        self.rnn_size = args.human_human_edge_rnn_size
-        self.embedding_size = args.human_human_edge_embedding_size
-        self.input_size = args.human_human_edge_input_size
+        self.rnn_size = config.SRNN.human_human_edge_rnn_size
+        self.embedding_size = config.SRNN.human_human_edge_embedding_size
+        self.input_size = config.SRNN.human_human_edge_input_size
 
         # Linear layer to embed input
         self.encoder_linear = nn.Linear(self.input_size, self.embedding_size)
@@ -214,7 +214,7 @@ class EdgeAttention(nn.Module):
     '''
     Class representing the attention module
     '''
-    def __init__(self, args):
+    def __init__(self, config):
         '''
         Initializer function
         params:
@@ -223,12 +223,12 @@ class EdgeAttention(nn.Module):
         '''
         super(EdgeAttention, self).__init__()
 
-        self.args = args
+        self.config = config
 
         # Store required sizes
-        self.human_human_edge_rnn_size = args.human_human_edge_rnn_size
-        self.human_node_rnn_size = args.human_node_rnn_size
-        self.attention_size = args.attention_size
+        self.human_human_edge_rnn_size = config.SRNN.human_human_edge_rnn_size
+        self.human_node_rnn_size = config.SRNN.human_node_rnn_size
+        self.attention_size = config.SRNN.attention_size
 
 
 
@@ -320,7 +320,7 @@ class SRNN(nn.Module):
     """
     Class representing the SRNN model
     """
-    def __init__(self, obs_space_dict, args, infer=False):
+    def __init__(self, obs_space_dict, config, infer=False):
         """
         Initializer function
         params:
@@ -330,26 +330,26 @@ class SRNN(nn.Module):
         super(SRNN, self).__init__()
         self.infer = infer
         self.is_recurrent = True
-        self.args=args
+        self.config=config
 
         self.human_num = obs_space_dict['edges'].shape[0] - 1
 
-        self.seq_length = args.seq_length
-        self.nenv = args.num_processes
-        self.nminibatch = args.num_mini_batch
+        self.seq_length = config.ppo.num_steps
+        self.nenv = config.training.num_processes
+        self.nminibatch = config.ppo.num_mini_batch
 
         # Store required sizes
-        self.human_node_rnn_size = args.human_node_rnn_size
-        self.human_human_edge_rnn_size = args.human_human_edge_rnn_size
-        self.output_size = args.human_node_output_size
+        self.human_node_rnn_size = config.SRNN.human_node_rnn_size
+        self.human_human_edge_rnn_size = config.SRNN.human_human_edge_rnn_size
+        self.output_size = config.SRNN.human_node_output_size
 
         # Initialize the Node and Edge RNNs
-        self.humanNodeRNN = HumanNodeRNN(args)
-        self.humanhumanEdgeRNN_spatial = HumanHumanEdgeRNN(args)
-        self.humanhumanEdgeRNN_temporal = HumanHumanEdgeRNN(args)
+        self.humanNodeRNN = HumanNodeRNN(config)
+        self.humanhumanEdgeRNN_spatial = HumanHumanEdgeRNN(config)
+        self.humanhumanEdgeRNN_temporal = HumanHumanEdgeRNN(config)
 
         # Initialize attention module
-        self.attn = EdgeAttention(args)
+        self.attn = EdgeAttention(config)
 
         init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
                                constant_(x, 0), np.sqrt(2))
@@ -396,7 +396,7 @@ class SRNN(nn.Module):
         # Get number of nodes
         numNodes = inputs['edges'].size()[1]
 
-        if self.args.no_cuda:
+        if not self.config.training.cuda:
             all_hidden_states_edge_RNNs = Variable(
                 torch.zeros(1, nenv, numNodes, rnn_hxs['human_human_edge_rnn'].size()[-1]).cpu())
         else:

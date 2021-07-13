@@ -31,7 +31,7 @@ except ImportError:
     pass
 
 
-def make_env(env_id, seed, rank, log_dir, allow_early_resets, envConfig=None, envNum=1, ax=None, test_case=-1):
+def make_env(env_id, seed, rank, log_dir, allow_early_resets, config=None, envNum=1, ax=None, test_case=-1):
     def _thunk():
         if env_id.startswith("dm"):
             _, domain, task = env_id.split('.')
@@ -44,7 +44,7 @@ def make_env(env_id, seed, rank, log_dir, allow_early_resets, envConfig=None, en
         if is_atari:
             env = make_atari(env_id)
 
-        env.configure(envConfig)
+        env.configure(config)
 
         envSeed = seed + rank if seed is not None else None
         # environment.render_axis = ax
@@ -100,10 +100,10 @@ def make_vec_envs(env_name,
                   device,
                   allow_early_resets,
                   num_frame_stack=None,
-                  envConfig=None,
+                  config=None,
                   ax=None, test_case=-1):
     envs = [
-        make_env(env_name, seed, i, log_dir, allow_early_resets, envConfig=envConfig,
+        make_env(env_name, seed, i, log_dir, allow_early_resets, config=config,
                  envNum=num_processes, ax=ax, test_case=test_case)
         for i in range(num_processes)
     ]

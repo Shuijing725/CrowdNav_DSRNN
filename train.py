@@ -8,9 +8,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from pytorchBaselines.a2c_ppo_acktr import algo, utils
-from arguments import get_args
+
 from pytorchBaselines.a2c_ppo_acktr.envs import make_vec_envs
 from pytorchBaselines.a2c_ppo_acktr.model import Policy
 from pytorchBaselines.a2c_ppo_acktr.storage import RolloutStorage
@@ -20,24 +21,21 @@ from crowd_nav.configs.config import Config
 from crowd_sim import *
 
 def main():
-	# arguments
-	algo_args = get_args()
-
+	config = Config()
 
 	# save policy to output_dir
-	if os.path.exists(algo_args.output_dir) and algo_args.overwrite: # if I want to overwrite the directory
-		shutil.rmtree(algo_args.output_dir)  # delete an entire directory tree
+	if os.path.exists(config.training.output_dir) and config.training.overwrite: # if I want to overwrite the directory
+		shutil.rmtree(config.training.output_dir)  # delete an entire directory tree
 
-	if not os.path.exists(algo_args.output_dir):
-		os.makedirs(algo_args.output_dir)
+	if not os.path.exists(config.training.output_dir):
+		os.makedirs(config.training.output_dir)
 
-	shutil.copytree('crowd_nav/configs', os.path.join(algo_args.output_dir, 'configs'))
-	shutil.copy('arguments.py', algo_args.output_dir)
+	shutil.copytree('crowd_nav/configs', os.path.join(config.training.output_dir, 'configs'))
 
 
 	# configure logging
-	log_file = os.path.join(algo_args.output_dir, 'output.log')
-	mode = 'a' if algo_args.resume else 'w'
+	log_file = os.path.join(config.training.output_dir, 'output.log')
+	mode = 'a' if config.training.resume else 'w'
 	file_handler = logging.FileHandler(log_file, mode=mode)
 	stdout_handler = logging.StreamHandler(sys.stdout)
 	level = logging.INFO
@@ -45,14 +43,10 @@ def main():
 						format='%(asctime)s, %(levelname)s: %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
 
 
-	config = Config()
-
-
-
-	torch.manual_seed(algo_args.seed)
-	torch.cuda.manual_seed_all(algo_args.seed)
-	if algo_args.cuda:
-		if algo_args.cuda_deterministic:
+	torch.manual_seed(config.env.seed)
+	torch.cuda.manual_seed_all(config.env.seed)
+	if config.training.cuda and torch.cuda.is_available():
+		if config.training.cuda_deterministic:
 			# reproducible but slower
 			torch.backends.cudnn.benchmark = False
 			torch.backends.cudnn.deterministic = True
@@ -63,39 +57,55 @@ def main():
 
 
 
-	torch.set_num_threads(algo_args.num_threads)
-	device = torch.device("cuda" if algo_args.cuda else "cpu")
+	torch.set_num_threads(config.training.num_threads)
+	device = torch.device("cuda" if config.training.cuda and torch.cuda.is_available() else "cpu")
 
 
 	logging.info('Create other envs with new settings')
 
 
 	# For fastest training: use GRU
-	env_name = algo_args.env_name
+	env_name = config.env.env_name
 	recurrent_cell = 'GRU'
 
-	# Create a wrapped, monitored VecEnv
-	envs = make_vec_envs(env_name, algo_args.seed, algo_args.num_processes,
-						 algo_args.gamma, None, device, False, envConfig=config)
+	if config.sim.render:
+		fig, ax = plt.subplots(figsize=(7, 7))
+		ax.set_xlim(-6, 6)
+		ax.set_ylim(-6, 6)
+		ax.set_xlabel('x(m)', fontsize=16)
+		ax.set_ylabel('y(m)', fontsize=16)
+		plt.ion()
+		plt.show()
+	else:
+		ax = None
+
+
+	if config.sim.render:
+		config.training.num_processes = 1
+		config.ppo.num_mini_batch = 1
+
+	# create a manager env
+	envs = make_vec_envs(env_name, config.env.seed, config.training.num_processes,
+						 config.reward.gamma, None, device, False, config=config, ax=ax)
 
 
 
 	actor_critic = Policy(
 		envs.observation_space.spaces, # pass the Dict into policy to parse
 		envs.action_space,
-		base_kwargs=algo_args,
+		base_kwargs=config,
 		base=config.robot.policy)
 
-	rollouts = RolloutStorage(algo_args.num_steps,
-							  algo_args.num_processes,
+	rollouts = RolloutStorage(config.ppo.num_steps,
+							  config.training.num_processes,
 							  envs.observation_space.spaces,
 							  envs.action_space,
-							  algo_args.human_node_rnn_size,
-							  algo_args.human_human_edge_rnn_size,
+							  config.SRNN.human_node_rnn_size,
+							  config.SRNN.human_human_edge_rnn_size,
 							  recurrent_cell_type=recurrent_cell)
 
-	if algo_args.resume: #retrieve the model if resume = True
-		load_path = algo_args.load_path
+	if config.training.resume: #retrieve the model if resume = True
+		load_path = config.training.load_path
 		actor_critic, _ = torch.load(load_path)
 
 
@@ -105,14 +115,14 @@ def main():
 
 	agent = algo.PPO(
 		actor_critic,
-		algo_args.clip_param,
-		algo_args.ppo_epoch,
-		algo_args.num_mini_batch,
-		algo_args.value_loss_coef,
-		algo_args.entropy_coef,
-		lr=algo_args.lr,
-		eps=algo_args.eps,
-		max_grad_norm=algo_args.max_grad_norm)
+		config.ppo.clip_param,
+		config.ppo.epoch,
+		config.ppo.num_mini_batch,
+		config.ppo.value_loss_coef,
+		config.ppo.entropy_coef,
+		lr=config.training.lr,
+		eps=config.training.eps,
+		max_grad_norm=config.training.max_grad_norm)
 
 
 
@@ -129,16 +139,15 @@ def main():
 
 	start = time.time()
 	num_updates = int(
-		algo_args.num_env_steps) // algo_args.num_steps // algo_args.num_processes
+		config.training.num_env_steps) // config.ppo.num_steps // config.training.num_processes
 
 	for j in range(num_updates):
 
-		if algo_args.use_linear_lr_decay:
+		if config.training.use_linear_lr_decay:
 			utils.update_linear_schedule(
-				agent.optimizer, j, num_updates,
-				agent.optimizer.lr if algo_args.algo == "acktr" else algo_args.lr)
+				agent.optimizer, j, num_updates, config.training.lr)
 
-		for step in range(algo_args.num_steps):
+		for step in range(config.ppo.num_steps):
 			# Sample actions
 			with torch.no_grad():
 
@@ -152,7 +161,8 @@ def main():
 					rollouts_obs, rollouts_hidden_s,
 					rollouts.masks[step])
 
-
+			if config.sim.render:
+				envs.render()
 			# Obser reward and next obs
 			obs, reward, done, infos = envs.step(action)
 			# print(done)
@@ -185,27 +195,30 @@ def main():
 
 
 
-		rollouts.compute_returns(next_value, algo_args.use_gae, algo_args.gamma,
-								 algo_args.gae_lambda, algo_args.use_proper_time_limits)
+		rollouts.compute_returns(next_value, config.ppo.use_gae, config.reward.gamma,
+								 config.ppo.gae_lambda, config.training.use_proper_time_limits)
 
 		value_loss, action_loss, dist_entropy = agent.update(rollouts)
 
 		rollouts.after_update()
 
 		# save the model for every interval-th episode or for the last epoch
-		if (j % algo_args.save_interval == 0
+		if (j % config.training.save_interval == 0
 			or j == num_updates - 1) :
-			save_path = os.path.join(algo_args.output_dir, 'checkpoints')
+			save_path = os.path.join(config.training.output_dir, 'checkpoints')
 			if not os.path.exists(save_path):
 				os.mkdir(save_path)
 
-			torch.save([
-				actor_critic,
-				getattr(utils.get_vec_normalize(envs), 'ob_rms', None)
-			], os.path.join(save_path, '%.5i'%j + ".pt"))
+			# if you normalized the observation, you may also want to save rms
+			# torch.save([
+			# 	actor_critic,
+			# 	getattr(utils.get_vec_normalize(envs), 'ob_rms', None)
+			# ], os.path.join(save_path, '%.5i'%j + ".pt"))
 
-		if j % algo_args.log_interval == 0 and len(episode_rewards) > 1:
-			total_num_steps = (j + 1) * algo_args.num_processes * algo_args.num_steps
+			torch.save(actor_critic.state_dict(), os.path.join(save_path, '%.5i' % j + ".pt"))
+
+		if j % config.training.log_interval == 0 and len(episode_rewards) > 1:
+			total_num_steps = (j + 1) * config.training.num_processes * config.ppo.num_steps
 			end = time.time()
 			print(
 				"Updates {}, num timesteps {}, FPS {} \n Last {} training episodes: mean/median reward "
@@ -222,10 +235,10 @@ def main():
 							   'loss/policy_entropy': dist_entropy, 'loss/policy_loss': action_loss,
 							   'loss/value_loss': value_loss})
 
-			if os.path.exists(os.path.join(algo_args.output_dir, 'progress.csv')) and j > 20:
-				df.to_csv(os.path.join(algo_args.output_dir, 'progress.csv'), mode='a', header=False, index=False)
+			if os.path.exists(os.path.join(config.training.output_dir, 'progress.csv')) and j > 20:
+				df.to_csv(os.path.join(config.training.output_dir, 'progress.csv'), mode='a', header=False, index=False)
 			else:
-				df.to_csv(os.path.join(algo_args.output_dir, 'progress.csv'), mode='w', header=True, index=False)
+				df.to_csv(os.path.join(config.training.output_dir, 'progress.csv'), mode='w', header=True, index=False)
 
 
 

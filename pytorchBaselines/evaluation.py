@@ -5,10 +5,9 @@ from crowd_sim.envs.utils.info import *
 from pytorchBaselines.a2c_ppo_acktr import utils
 
 
-
-def evaluate(actor_critic, ob_rms, eval_envs, num_processes, device, test_size, logging, visualize=False,
+def evaluate(actor_critic, ob_rms, eval_envs, num_processes, device, config, logging, visualize=False,
              recurrent_type='GRU'):
-
+    test_size = config.env.test_size
 
     if ob_rms:
         vec_norm = utils.get_vec_normalize(eval_envs)
@@ -28,11 +27,11 @@ def evaluate(actor_critic, ob_rms, eval_envs, num_processes, device, test_size, 
 
     node_num = 1
     edge_num = actor_critic.base.human_num + 1
-    eval_recurrent_hidden_states['human_node_rnn'] = torch.zeros(num_processes, node_num, actor_critic.base.human_node_rnn_size * rnn_factor,
+    eval_recurrent_hidden_states['human_node_rnn'] = torch.zeros(num_processes, node_num, config.SRNN.human_node_rnn_size * rnn_factor,
                                                                  device=device)
 
     eval_recurrent_hidden_states['human_human_edge_rnn'] = torch.zeros(num_processes, edge_num,
-                                                                       actor_critic.base.human_human_edge_rnn_size*rnn_factor,
+                                                                       config.SRNN.human_human_edge_rnn_size*rnn_factor,
                                                                        device=device)
 
     eval_masks = torch.zeros(num_processes, 1, device=device)
@@ -53,17 +52,18 @@ def evaluate(actor_critic, ob_rms, eval_envs, num_processes, device, test_size, 
     gamma = 0.99
     baseEnv = eval_envs.venv.envs[0].env
 
+    obs = eval_envs.reset()
     for k in range(test_size):
         done = False
         rewards = []
         stepCounter = 0
         episode_rew = 0
-        obs = eval_envs.reset()
+
         global_time = 0.0
         path = 0.0
         chc = 0.0
 
-        last_pos = obs['robot_node'][0, 0, 1:3].cpu().numpy()  # robot px, py
+        last_pos = obs['robot_node'][0, 0, 0:2].cpu().numpy()  # robot px, py
         last_angle = np.arctan2(obs['edges'][0, 0, 1].cpu().numpy(), obs['edges'][0, 0, 0].cpu().numpy())  # robot theta
 
 
@@ -88,7 +88,7 @@ def evaluate(actor_critic, ob_rms, eval_envs, num_processes, device, test_size, 
 
             chc = chc + abs(np.arctan2(obs['edges'][0, 0, 1].cpu().numpy(), obs['edges'][0, 0, 0].cpu().numpy()) - last_angle)
 
-            last_pos = obs['robot_node'][0, 0, 1:3].cpu().numpy()  # robot px, py
+            last_pos = obs['robot_node'][0, 0, 0:2].cpu().numpy()  # robot px, py
             last_angle = np.arctan2(obs['edges'][0, 0, 1].cpu().numpy(), obs['edges'][0, 0, 0].cpu().numpy())  # robot theta
 
 

@@ -10,6 +10,7 @@ import torch.nn as nn
 from pytorchBaselines.a2c_ppo_acktr.envs import make_vec_envs
 from pytorchBaselines.evaluation import evaluate
 from crowd_sim import *
+from pytorchBaselines.a2c_ppo_acktr.model import Policy
 
 
 def main():
@@ -17,7 +18,7 @@ def main():
 	parser = argparse.ArgumentParser('Parse configuration file')
 	# the model directory that we are testing
 	parser.add_argument('--model_dir', type=str, default='data/example_model')
-	parser.add_argument('--visualize', default=True, action='store_true')
+	parser.add_argument('--visualize', default=False, action='store_true')
 	# if -1, it will run 500 different cases; if >=0, it will run the specified test case repeatedly
 	parser.add_argument('--test_case', type=int, default=-1)
 	# model weight file you want to test
@@ -28,16 +29,6 @@ def main():
 	model_dir_temp = test_args.model_dir
 	if model_dir_temp.endswith('/'):
 		model_dir_temp = model_dir_temp[:-1]
-	# import arguments.py from saved directory
-	# if not found, import from the default directory
-	try:
-		model_dir_string = model_dir_temp.replace('/', '.') + '.arguments'
-		model_arguments = import_module(model_dir_string)
-		get_args = getattr(model_arguments, 'get_args')
-	except:
-		print('Failed to get get_args function from ', test_args.model_dir, '/arguments.py')
-		from arguments import get_args
-
 	# import config class from saved directory
 	# if not found, import from the default directory
 	try:
@@ -45,13 +36,12 @@ def main():
 		model_arguments = import_module(model_dir_string)
 		Config = getattr(model_arguments, 'Config')
 	except:
-		print('Failed to get Config function from ', test_args.model_dir, '/arguments.py')
+		print('Failed to get Config function from ', test_args.model_dir, '/config.py')
 		from crowd_nav.configs.config import Config
 
 
 	config = Config()
 
-	algo_args = get_args()
 
 
 	# configure logging and device
@@ -75,10 +65,10 @@ def main():
 	logging.info('robot FOV %f', config.robot.FOV)
 	logging.info('humans FOV %f', config.humans.FOV)
 
-	torch.manual_seed(algo_args.seed)
-	torch.cuda.manual_seed_all(algo_args.seed)
-	if algo_args.cuda:
-		if algo_args.cuda_deterministic:
+	torch.manual_seed(config.env.seed)
+	torch.cuda.manual_seed_all(config.env.seed)
+	if config.training.cuda:
+		if config.training.cuda_deterministic:
 			# reproducible but slower
 			torch.backends.cudnn.benchmark = False
 			torch.backends.cudnn.deterministic = True
@@ -89,7 +79,7 @@ def main():
 
 
 	torch.set_num_threads(1)
-	device = torch.device("cuda" if algo_args.cuda else "cpu")
+	device = torch.device("cuda" if config.training.cuda else "cpu")
 
 	logging.info('Create other envs with new settings')
 
@@ -109,31 +99,35 @@ def main():
 	load_path=os.path.join(test_args.model_dir,'checkpoints', test_args.test_model)
 	print(load_path)
 
-	actor_critic, _ = torch.load(load_path)
 
-	actor_critic.base.nenv = 1
+	env_name = config.env.env_name
 
-	env_name = algo_args.env_name
 	recurrent_cell = 'GRU'
 
 	eval_dir = os.path.join(test_args.model_dir,'eval')
 	if not os.path.exists(eval_dir):
 		os.mkdir(eval_dir)
 
+	envs = make_vec_envs(env_name, config.env.seed, 1,
+						 config.reward.gamma, eval_dir, device, allow_early_resets=True,
+						 config=config, ax=ax, test_case=test_args.test_case)
 
-	envs = make_vec_envs(env_name, algo_args.seed, 1,
-						 algo_args.gamma, eval_dir, device, allow_early_resets=True,
-						 envConfig=config, ax=ax, test_case=test_args.test_case)
+	actor_critic = Policy(
+		envs.observation_space.spaces,  # pass the Dict into policy to parse
+		envs.action_space,
+		base_kwargs=config,
+		base=config.robot.policy)
+
+	actor_critic.load_state_dict(torch.load(load_path, map_location=device))
+	actor_critic.base.nenv = 1
 
 	# allow the usage of multiple GPUs to increase the number of examples processed simultaneously
 	nn.DataParallel(actor_critic).to(device)
 
-	test_size = config.env.test_size
-
 	ob_rms = False
 
 	# actor_critic, ob_rms, eval_envs, num_processes, device, num_episodes
-	evaluate(actor_critic, ob_rms, envs, 1, device, test_size, logging, test_args.visualize, recurrent_cell)
+	evaluate(actor_critic, ob_rms, envs, 1, device, config, logging, test_args.visualize, recurrent_cell)
 
 
 if __name__ == '__main__':

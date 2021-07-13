@@ -12,7 +12,7 @@ def _flatten_helper(T, N, _tensor):
 
 class RolloutStorage(object):
     def __init__(self, num_steps, num_processes, obs_shape, action_space,
-                 human_node_rnn_size, human_human_edge_rnn_size, recurrent_cell_type, complete_graph=True):
+                 human_node_rnn_size, human_human_edge_rnn_size, recurrent_cell_type):
 
         if isinstance(obs_shape, dict):
             self.obs = {}

@@ -1,0 +1,25 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## 2021-07-13
+### Added
+- unicycle example model
+
+### Changed
+- Fix an index issue for last_pos in evaluation.py
+- Merged config.py and argument.py
+- Save checkpoints by saving only the state_dict instead of the entire model
+
+### Removed
+- argument.py
+
+## 2021-07-01
+### Added
+- unicycle example model
+
+### Changed
+- Minor bug fix
+
+## 2021-03-19
+Initial commit
