@@ -114,7 +114,6 @@ class Config(object):
     # RNN size
     SRNN.human_node_rnn_size = 128  # Size of Human Node RNN hidden state
     SRNN.human_human_edge_rnn_size = 256  # Size of Human Human Edge RNN hidden state
-    SRNN.aux_loss = False  # auxiliary loss on human nodes outputs
 
     # Input and output size
     SRNN.human_node_input_size = 3  # Dimension of the node features
