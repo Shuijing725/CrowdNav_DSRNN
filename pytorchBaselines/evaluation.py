@@ -64,7 +64,7 @@ def evaluate(actor_critic, ob_rms, eval_envs, num_processes, device, config, log
         chc = 0.0
 
         last_pos = obs['robot_node'][0, 0, 0:2].cpu().numpy()  # robot px, py
-        last_angle = np.arctan2(obs['edges'][0, 0, 1].cpu().numpy(), obs['edges'][0, 0, 0].cpu().numpy())  # robot theta
+        last_angle = np.arctan2(obs['temporal_edges'][0, 0, 1].cpu().numpy(), obs['temporal_edges'][0, 0, 0].cpu().numpy())  # robot theta
 
 
         while not done:
@@ -86,10 +86,11 @@ def evaluate(actor_critic, ob_rms, eval_envs, num_processes, device, config, log
             path = path + np.linalg.norm(np.array([last_pos[0] - obs['robot_node'][0, 0, 1].cpu().numpy(),
                                                    last_pos[1] - obs['robot_node'][0, 0, 2].cpu().numpy()]))
 
-            chc = chc + abs(np.arctan2(obs['edges'][0, 0, 1].cpu().numpy(), obs['edges'][0, 0, 0].cpu().numpy()) - last_angle)
+            cur_angle = np.arctan2(obs['temporal_edges'][0, 0, 1].cpu().numpy(), obs['temporal_edges'][0, 0, 0].cpu().numpy())
+            chc = chc +  abs(cur_angle - last_angle)
 
             last_pos = obs['robot_node'][0, 0, 0:2].cpu().numpy()  # robot px, py
-            last_angle = np.arctan2(obs['edges'][0, 0, 1].cpu().numpy(), obs['edges'][0, 0, 0].cpu().numpy())  # robot theta
+            last_angle = cur_angle
 
 
             rewards.append(rew)

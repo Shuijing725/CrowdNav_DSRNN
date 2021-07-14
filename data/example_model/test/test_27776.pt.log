@@ -1,13 +1,13 @@
-2021-03-26 09:48:42, INFO: robot FOV 2.000000
-2021-03-26 09:48:42, INFO: humans FOV 2.000000
-2021-03-26 09:48:42, INFO: Create other envs with new settings
-2021-03-26 09:48:43, INFO: human number: 5
-2021-03-26 09:48:43, INFO: Randomize human's radius and preferred speed
-2021-03-26 09:48:43, INFO: Circle width: 6
-2021-03-26 09:48:43, INFO: robot FOV 6.283185
-2021-03-26 09:48:43, INFO: humans FOV 6.283185
-2021-03-26 09:50:17, INFO: TEST  has success rate: 0.92, collision rate: 0.08, timeout rate: 0.00, nav time: 10.37, total reward: 21.5979
-2021-03-26 09:50:17, INFO: Frequency of being in danger: 0.02 and average min separate distance in danger: 0.15
-2021-03-26 09:50:17, INFO: TEST  has average path length: 10.45, CHC: 12.00
-2021-03-26 09:50:17, INFO: Collision cases: 13 18 36 40 54 59 66 77 81 99 143 150 161 184 195 202 212 221 230 232 234 263 268 286 290 304 309 316 327 331 349 393 400 411 434 445 452 462 471 480 482 484
-2021-03-26 09:50:17, INFO: Timeout cases: 
+2021-07-13 23:00:33, INFO: robot FOV 2.000000
+2021-07-13 23:00:33, INFO: humans FOV 2.000000
+2021-07-13 23:00:33, INFO: Create other envs with new settings
+2021-07-13 23:00:33, INFO: human number: 5
+2021-07-13 23:00:33, INFO: Randomize human's radius and preferred speed
+2021-07-13 23:00:33, INFO: Circle width: 6
+2021-07-13 23:00:33, INFO: robot FOV 6.283185
+2021-07-13 23:00:33, INFO: humans FOV 6.283185
+2021-07-13 23:02:15, INFO: TEST  has success rate: 0.90, collision rate: 0.10, timeout rate: 0.00, nav time: 10.06, total reward: 20.8718
+2021-07-13 23:02:15, INFO: Frequency of being in danger: 0.02 and average min separate distance in danger: 0.15
+2021-07-13 23:02:15, INFO: TEST  has average path length: 190.30, CHC: 11.43
+2021-07-13 23:02:15, INFO: Collision cases: 11 15 19 26 36 51 72 80 93 108 118 123 132 137 154 159 162 173 181 187 193 198 223 225 231 257 267 285 286 287 289 297 300 319 322 323 355 357 359 361 368 375 390 404 424 442 445 460 464 468
+2021-07-13 23:02:15, INFO: Timeout cases: 9
