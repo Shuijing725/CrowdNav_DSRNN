@@ -332,7 +332,7 @@ class SRNN(nn.Module):
         self.is_recurrent = True
         self.config=config
 
-        self.human_num = obs_space_dict['edges'].shape[0] - 1
+        self.human_num = config.sim.human_num
 
         self.seq_length = config.ppo.num_steps
         self.nenv = config.training.num_processes
@@ -370,7 +370,7 @@ class SRNN(nn.Module):
         self.robot_linear = init_(nn.Linear(7, 3))
         self.human_node_final_linear=init_(nn.Linear(self.output_size,2))
 
-
+        self.num_edges = self.human_num + 1 # number of spatial edges + number of temporal edges
         self.temporal_edges = [0]
         self.spatial_edges = np.arange(1, self.human_num+1)
 
@@ -387,36 +387,32 @@ class SRNN(nn.Module):
             nenv = self.nenv // self.nminibatch
 
         robot_node = reshapeT(inputs['robot_node'], seq_length, nenv)
-        edges = reshapeT(inputs['edges'], seq_length, nenv)
+        temporal_edges = reshapeT(inputs['temporal_edges'], seq_length, nenv)
+        spatial_edges = reshapeT(inputs['spatial_edges'], seq_length, nenv)
 
         hidden_states_node_RNNs = reshapeT(rnn_hxs['human_node_rnn'], 1, nenv)
         hidden_states_edge_RNNs = reshapeT(rnn_hxs['human_human_edge_rnn'], 1, nenv)
         masks = reshapeT(masks, seq_length, nenv)
 
-        # Get number of nodes
-        numNodes = inputs['edges'].size()[1]
-
         if not self.config.training.cuda:
             all_hidden_states_edge_RNNs = Variable(
-                torch.zeros(1, nenv, numNodes, rnn_hxs['human_human_edge_rnn'].size()[-1]).cpu())
+                torch.zeros(1, nenv, self.num_edges, rnn_hxs['human_human_edge_rnn'].size()[-1]).cpu())
         else:
             all_hidden_states_edge_RNNs = Variable(
-                torch.zeros(1, nenv, numNodes, rnn_hxs['human_human_edge_rnn'].size()[-1]).cuda())
+                torch.zeros(1, nenv, self.num_edges, rnn_hxs['human_human_edge_rnn'].size()[-1]).cuda())
 
 
         # Do forward pass through temporaledgeRNN
-        edges_temporal_start_end=edges[:,:,self.temporal_edges,:]
         hidden_temporal_start_end=hidden_states_edge_RNNs[:,:,self.temporal_edges,:]
-        output_temporal, hidden_temporal = self.humanhumanEdgeRNN_temporal(edges_temporal_start_end, hidden_temporal_start_end, masks)
+        output_temporal, hidden_temporal = self.humanhumanEdgeRNN_temporal(temporal_edges, hidden_temporal_start_end, masks)
 
         # Update the hidden state and cell state
         all_hidden_states_edge_RNNs[:, :, self.temporal_edges,:] = hidden_temporal
 
         # Spatial Edges
-        edges_spatial_start_end=edges[:,:,self.spatial_edges,:]
         hidden_spatial_start_end=hidden_states_edge_RNNs[:,:,self.spatial_edges,:]
         # Do forward pass through spatialedgeRNN
-        output_spatial, hidden_spatial = self.humanhumanEdgeRNN_spatial(edges_spatial_start_end, hidden_spatial_start_end, masks)
+        output_spatial, hidden_spatial = self.humanhumanEdgeRNN_spatial(spatial_edges, hidden_spatial_start_end, masks)
 
         # Update the hidden state and cell state
         all_hidden_states_edge_RNNs[:, :,self.spatial_edges,: ] = hidden_spatial

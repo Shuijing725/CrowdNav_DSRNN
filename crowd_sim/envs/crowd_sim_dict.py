@@ -28,10 +28,11 @@ class CrowdSimDict(CrowdSim):
         # clip the action and observation as you need
 
         d={}
-        # robot node: num_visible_humans, px, py, r, gx, gy, v_pref, theta
+        # robot node: px, py, r, gx, gy, v_pref, theta
         d['robot_node'] = gym.spaces.Box(low=-np.inf, high=np.inf, shape=(1,7,), dtype = np.float32)
-        # only consider all temporal edges (human_num+1) and spatial edges pointing to robot (human_num)
-        d['edges'] = gym.spaces.Box(low=-np.inf, high=np.inf, shape=(self.human_num + 1, 2), dtype=np.float32)
+        # only consider the robot temporal edge and spatial edges pointing from robot to each human
+        d['temporal_edges'] = gym.spaces.Box(low=-np.inf, high=np.inf, shape=(1,2,), dtype=np.float32)
+        d['spatial_edges'] = gym.spaces.Box(low=-np.inf, high=np.inf, shape=(self.human_num, 2), dtype=np.float32)
         self.observation_space=gym.spaces.Dict(d)
 
         high = np.inf * np.ones([2, ])
@@ -48,28 +49,16 @@ class CrowdSimDict(CrowdSim):
 
         ob['robot_node'] = self.robot.get_full_state_list_noV()
 
-
         self.update_last_human_states(human_visibility, reset=reset)
 
-
         # edges
-        # agent_list = [self.robot] + self.humans
-        # human_visibility = [True] + human_visibility
-        # format of each observable state: [self.px, self.py, self.vx, self.vy, self.radius]
-        agents = np.vstack((np.array(self.robot.get_observable_state_list()), self.last_human_states))
-
-
-        ob['edges'] = np.zeros((self.human_num + 1, 2)) # 0-5: temporal edges, 6-10: spatial edges
-
-        for i in range(self.human_num+1):
-            # temporal edges
-            if i == 0:
-                ob['edges'][i, :] = np.array([agents[0, 2], agents[0, 3]])
-            # spatial edges
-            else:
-                # vector pointing from human i to robot
-                relative_pos = np.array([agents[i, 0] - agents[0, 0], agents[i, 1] - agents[0, 1]])
-                ob['edges'][i, :] = relative_pos
+        # temporal edge: robot's velocity
+        ob['temporal_edges'] = np.array([self.robot.vx, self.robot.vy])
+        # spatial edges: the vector pointing from the robot position to each human's position
+        ob['spatial_edges'] = np.zeros((self.human_num, 2))
+        for i in range(self.human_num):
+            relative_pos = np.array([self.humans[i].px - self.robot.px, self.humans[i].py - self.robot.py])
+            ob['spatial_edges'][i] = relative_pos
 
         return ob
 

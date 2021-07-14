@@ -1,4 +1,3 @@
-
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -7,14 +6,14 @@ import numpy as np
 
 legends = ['DS-RNN FoV=360', '']
 
-# change the folder directories here!
-# for holonomic weight
-logs1 = pd.read_csv("data/example_model/progress.csv")
-# for the unicycle weight
-# logs1 = pd.read_csv("data/example_model_unicycle/progress.csv")
+# add more training curves by directory name here!
+log_list = [pd.read_csv("data/example_model/progress.csv"),
+		   ]
 
-#3:logs3, 4:logs4, 5:logs5, 6:logs6, 7:logs7, ,9:logs9
-logDicts={1:logs1} # 1:logs1, 2:logs2, 3:logs3, 4:logs4, 5:logs5}
+logDicts = {}
+for i in range(len(log_list)):
+	logDicts[i] = log_list[i]
+
 graphDicts={0:'eprewmean', 1:'loss/value_loss'}
 
 legendList=[]

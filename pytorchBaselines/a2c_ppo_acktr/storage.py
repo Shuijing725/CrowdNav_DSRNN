@@ -18,7 +18,7 @@ class RolloutStorage(object):
             self.obs = {}
             for key in obs_shape:
                 self.obs[key] = torch.zeros(num_steps + 1, num_processes, *(obs_shape[key].shape))
-            self.human_num = obs_shape['edges'].shape[0] - 1
+            self.human_num = obs_shape['spatial_edges'].shape[0]
         else:
             self.obs = torch.zeros(num_steps + 1, num_processes, *obs_shape)
 
