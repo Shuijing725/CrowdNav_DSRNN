@@ -45,7 +45,6 @@ class CrowdSimDict(CrowdSim):
 
         # nodes
         visible_humans, num_visibles, human_visibility = self.get_num_human_in_fov()
-        visible_obs, num_visible_obs, _ = self.get_num_human_in_fov()
 
         ob['robot_node'] = self.robot.get_full_state_list_noV()
 
