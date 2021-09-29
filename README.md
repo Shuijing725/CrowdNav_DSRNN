@@ -30,10 +30,7 @@ pip install -e .
 ```
 
 3. Install [Python-RVO2](https://github.com/sybrenstuvel/Python-RVO2) library
-4. Install crowd_sim and crowd_nav into pip
-```
-pip install -e .
-```
+
 
 ## Getting started
 This repository is organized in two parts: crowd_sim/ folder contains the simulation environment and
