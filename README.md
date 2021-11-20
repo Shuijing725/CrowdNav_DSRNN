@@ -38,7 +38,8 @@ This repository is organized in three parts:
 [here](crowd_sim/README.md).
 - `crowd_nav/` folder contains configurations and non-neural network policies
 - `pytorchBaselines/` contains the code for the DSRNN network and ppo algorithm.  
- Below are the instructions for training and testing policies.
+ 
+Below are the instructions for training and testing policies.
 
 ### Change configurations
 1. Environment configurations and training hyperparameters: modify `crowd_nav/configs/config.py`
