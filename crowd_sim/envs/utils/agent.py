@@ -171,7 +171,6 @@ class Agent(object):
         Perform an action and update the state
         """
         self.check_validity(action)
-        last_x, last_y = self.px, self.py
         pos = self.compute_position(action, self.time_step)
         self.px, self.py = pos
         if self.kinematics == 'holonomic':

@@ -12,8 +12,9 @@ from crowd_nav.policy.orca import ORCA
 from crowd_sim.envs.utils.state import *
 
 
-
 from crowd_nav.policy.policy_factory import policy_factory
+
+# The base class for our simulation environment
 
 class CrowdSim(gym.Env):
     def __init__(self):
@@ -75,6 +76,7 @@ class CrowdSim(gym.Env):
         self.potential = None
 
 
+    # configurate the environment with the given config
     def configure(self, config):
         self.config = config
 
@@ -175,6 +177,7 @@ class CrowdSim(gym.Env):
         raise NotImplementedError
 
 
+    # add all generated humans to the self.humans list
     def generate_random_human_position(self, human_num):
         """
         Generate human position: generate start position on a circle, goal position is at the opposite side
@@ -186,7 +189,7 @@ class CrowdSim(gym.Env):
             self.humans.append(self.generate_circle_crossing_human())
 
 
-    # return a static human in env
+    # generate and return a static human
     # position: (px, py) for fixed position, or None for random position
     def generate_circle_static_obstacle(self, position=None):
         # generate a human with radius = 0.3, v_pref = 1, visible = True, and policy = orca
@@ -219,6 +222,8 @@ class CrowdSim(gym.Env):
         human.set(px, py, px, py, 0, 0, 0, v_pref=0)
         return human
 
+
+    # generate and return a moving human
     def generate_circle_crossing_human(self):
         human = Human(self.config, 'humans')
         if self.randomize_attributes:
@@ -251,14 +256,11 @@ class CrowdSim(gym.Env):
             if not collide:
                 break
 
-        # px = np.random.uniform(-6, 6)
-        # py = np.random.uniform(-3, 3.5)
-        # human.set(px, py, px, py, 0, 0, 0)
         human.set(px, py, -px, -py, 0, 0, 0)
         return human
 
 
-    # add noise according to env.config to state
+    # add noise according to env.config to observation
     def apply_noise(self, ob):
         if isinstance(ob[0], ObservableState):
             for i in range(len(ob)):
@@ -284,6 +286,7 @@ class CrowdSim(gym.Env):
                 noise = [0] * len(ob)
 
             return ob + noise
+
 
     # update the robot belief of human states
     # if a human is visible, its state is updated to its current ground truth state
@@ -316,6 +319,7 @@ class CrowdSim(gym.Env):
                     # Plan B: assume the human doesn't move, use last observation
                     # self.last_human_states[i, :] = np.array([px, py, 0., 0., r])
 
+
     # return the ground truth locations of all humans
     def get_true_human_states(self):
         true_human_states = np.zeros((self.human_num, 2))
@@ -323,6 +327,7 @@ class CrowdSim(gym.Env):
             humanS = np.array(self.humans[i].get_observable_state_list())
             true_human_states[i, :] = humanS[:2]
         return true_human_states
+
 
     def randomize_human_policies(self):
         """
@@ -495,9 +500,7 @@ class CrowdSim(gym.Env):
             self.generate_random_human_position(human_num=human_num)
 
 
-
-
-
+    # reset function
     def reset(self, phase='train', test_case=None):
         """
         Set px, py, gx, gy, vx, vy, theta for robot and humans
@@ -516,7 +519,6 @@ class CrowdSim(gym.Env):
             self.case_counter[phase] = test_case # test case is passed in to calculate specific seed to generate case
         self.global_time = 0
 
-
         self.humans = []
         # train, val, and test phase should start with different seed.
         # case capacity: the maximum number for train(max possible int -2000), val(1000), and test(1000)
@@ -530,22 +532,18 @@ class CrowdSim(gym.Env):
         self.generate_robot_humans(phase)
 
 
-
         # If configured to randomize human policies, do so
         if self.random_policy_changing:
             self.randomize_human_policies()
 
-
         # case size is used to make sure that the case_counter is always between 0 and case_size[phase]
         self.case_counter[phase] = (self.case_counter[phase] + int(1*self.nenv)) % self.case_size[phase]
-
 
         # get current observation
         ob = self.generate_ob(reset=True)
 
         # initialize potential
         self.potential = -abs(np.linalg.norm(np.array([self.robot.px, self.robot.py]) - np.array([self.robot.gx, self.robot.gy])))
-
 
         return ob
 
@@ -595,7 +593,6 @@ class CrowdSim(gym.Env):
 
     # Update the specified human's end goals in the environment randomly
     def update_human_goal(self, human):
-
         # Update human's goals randomly
         if np.random.random() <= self.end_goal_change_chance:
             if not self.group_human:
@@ -611,7 +608,6 @@ class CrowdSim(gym.Env):
             # Update human's v_pref now that it's reached goal
             if self.random_v_pref:
                 human.v_pref += np.random.uniform(-0.1, 0.1)
-
 
             while True:
                 angle = np.random.random() * np.pi * 2
@@ -695,7 +691,6 @@ class CrowdSim(gym.Env):
         return humans_in_view, num_humans_in_view, human_ids
 
 
-
     # convert an np array with length = 34 to a JointState object
     def array_to_jointstate(self, obs_list):
         fullstate = FullState(obs_list[0], obs_list[1], obs_list[2], obs_list[3],
@@ -722,7 +717,7 @@ class CrowdSim(gym.Env):
             humans.append(h)
         return humans
 
-    # find R(s, a)
+    # find R(s, a), done or not, and episode information
     def calc_reward(self, action):
         # collision detection
         dmin = float('inf')
@@ -797,7 +792,7 @@ class CrowdSim(gym.Env):
 
         return reward, done, episode_info
 
-    # compute the observation
+    # compute the observation as a flattened array
     def generate_ob(self, reset):
         visible_human_states, num_visible_humans, human_visibility = self.get_num_human_in_fov()
         self.update_last_human_states(human_visibility, reset=reset)
@@ -818,6 +813,7 @@ class CrowdSim(gym.Env):
 
         return ob
 
+    # get the actions for all humans at the current timestep
     def get_human_actions(self):
         # step all humans
         human_actions = []  # a list of all humans' actions
@@ -855,6 +851,8 @@ class CrowdSim(gym.Env):
             human_actions.append(human.act(ob))
         return human_actions
 
+
+    # step function
     def step(self, action, update=True):
         """
         Compute actions for all agents, detect collision, update environment and return (ob, reward, done, info)
@@ -900,6 +898,8 @@ class CrowdSim(gym.Env):
 
         return ob, reward, done, info
 
+
+    # render function
     def render(self, mode='human'):
         import matplotlib.pyplot as plt
         import matplotlib.lines as mlines

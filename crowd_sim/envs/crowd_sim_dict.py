@@ -5,6 +5,7 @@ import copy
 from crowd_sim.envs.utils.action import ActionRot, ActionXY
 from crowd_sim.envs import CrowdSim
 
+# The class for the simulation environment used for training a DSRNN policy
 
 class CrowdSimDict(CrowdSim):
     def __init__(self):
@@ -19,7 +20,7 @@ class CrowdSimDict(CrowdSim):
         self.desiredVelocity=[0.0,0.0]
 
 
-
+    # define the observation space and the action space
     def set_robot(self, robot):
         self.robot = robot
 
@@ -39,6 +40,7 @@ class CrowdSimDict(CrowdSim):
         self.action_space = gym.spaces.Box(-high, high, dtype=np.float32)
 
 
+    # generate observation for each timestep
     # reset = True: reset calls this function; reset = False: step calls this function
     def generate_ob(self, reset):
         ob = {}
@@ -62,6 +64,7 @@ class CrowdSimDict(CrowdSim):
         return ob
 
 
+    # reset function
     def reset(self, phase='train', test_case=None):
         """
         Set px, py, gx, gy, vx, vy, theta for robot and humans
@@ -79,8 +82,6 @@ class CrowdSimDict(CrowdSim):
         if test_case is not None:
             self.case_counter[phase] = test_case # test case is passed in to calculate specific seed to generate case
         self.global_time = 0
-
-
 
         self.desiredVelocity = [0.0, 0.0]
         self.humans = []
@@ -113,6 +114,7 @@ class CrowdSimDict(CrowdSim):
         return ob
 
 
+    # step function
     def step(self, action, update=True):
         """
         Compute actions for all agents, detect collision, update environment and return (ob, reward, done, info)

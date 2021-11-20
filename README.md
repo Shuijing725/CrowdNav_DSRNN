@@ -33,11 +33,12 @@ pip install -e .
 
 
 ## Getting started
-This repository is organized in two parts: crowd_sim/ folder contains the simulation environment and
-crowd_nav/ folder contains codes for training and testing the policies. The folder pytorchBaselines contains the code
-for the network and ppo algorithm.
-Details of the simulation framework can be found
-[here](crowd_sim/README.md). Below are the instructions for training and testing policies.
+This repository is organized in three parts: 
+- `crowd_sim/` folder contains the simulation environment. Details of the simulation framework can be found
+[here](crowd_sim/README.md).
+- `crowd_nav/` folder contains configurations and non-neural network policies
+- `pytorchBaselines/` contains the code for the DSRNN network and ppo algorithm.  
+ Below are the instructions for training and testing policies.
 
 ### Change configurations
 1. Environment configurations and training hyperparameters: modify `crowd_nav/configs/config.py`
@@ -69,7 +70,7 @@ python plot.py
 ```
 (We only tested our code in Ubuntu 16.04 and 18.04 with Python 3.6.)
 
-## Learning Curve
+## Learning curves
 Learning curves of DS-RNN in 360 degrees FoV environment with 5 humans.
 
 <img src="/figures/reward.png" width="450" />

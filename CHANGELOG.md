@@ -2,9 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-## 2021-11-19
+## 2021-11-20
 ### Changed
-- Added comments in config.py
+- Added comments in config.py and crowd_sim/
 
 ### Removed
 - Redundant configs that are never used in config.py
