@@ -28,9 +28,6 @@ class Config(object):
 
     sim = BaseConfig()
     sim.render = False # show GUI for visualization
-    sim.train_val_sim = "circle_crossing"
-    sim.test_sim = "circle_crossing"
-    sim.square_width = 10
     sim.circle_radius = 6
     sim.human_num = 5
     # Group environment: set to true; FoV environment: false
@@ -42,7 +39,6 @@ class Config(object):
     humans.policy = "orca"
     humans.radius = 0.3
     humans.v_pref = 1
-    humans.sensor = "coordinates"
     # FOV = this values * PI
     humans.FOV = 2.
 
@@ -61,16 +57,16 @@ class Config(object):
     # one human may have a random chance to be blind to other agents at every time step
     humans.random_unobservability = False
     humans.unobservable_chance = 0.3
-
+    # randomly change the human policy or not
     humans.random_policy_changing = False
 
+    # robot settings
     robot = BaseConfig()
     robot.visible = False # the robot is visible to humans
-    # srnn for now
+    # robot policy: srnn for now
     robot.policy = 'srnn'
-    robot.radius = 0.3
-    robot.v_pref = 1
-    robot.sensor = "coordinates"
+    robot.radius = 0.3 # radius of the robot
+    robot.v_pref = 1 # max velocity of the robot
     # FOV = this values * PI
     robot.FOV = 2.
 

@@ -7,15 +7,17 @@ class BaseConfig(object):
 
 
 class Config(object):
+    # environment settings
     env = BaseConfig()
     env.env_name = 'CrowdSimDict-v0'  # name of the environment
-    env.time_limit = 50
-    env.time_step = 0.25
+    env.time_limit = 50 # time limit of each episode (second)
+    env.time_step = 0.25 # length of each timestep/control frequency (second)
     env.val_size = 100
-    env.test_size = 500
-    env.randomize_attributes = True
-    env.seed = 0  # env random seed
+    env.test_size = 500 # number of episodes for test.py
+    env.randomize_attributes = True # randomize the preferred velocity and radius of humans or not
+    env.seed = 0  # random seed for environment
 
+    # reward function
     reward = BaseConfig()
     reward.success_reward = 10
     reward.collision_penalty = -20
@@ -26,23 +28,21 @@ class Config(object):
     reward.discomfort_penalty_factor = 10
     reward.gamma = 0.99  # discount factor for rewards
 
+    # environment settings
     sim = BaseConfig()
     sim.render = False # show GUI for visualization
-    sim.train_val_sim = "circle_crossing"
-    sim.test_sim = "circle_crossing"
-    sim.square_width = 10
-    sim.circle_radius = 6
-    sim.human_num = 5
+    sim.circle_radius = 6 # radius of the circle where all humans start on
+    sim.human_num = 5 # total number of humans
     # Group environment: set to true; FoV environment: false
     sim.group_human = False
 
+    # human settings
     humans = BaseConfig()
     humans.visible = True # a human is visible to other humans and the robot
-    # orca or social_force for now
+    # policy to control the humans: orca or social_force
     humans.policy = "orca"
-    humans.radius = 0.3
-    humans.v_pref = 1
-    humans.sensor = "coordinates"
+    humans.radius = 0.3 # radius of each human
+    humans.v_pref = 1 # max velocity of each human
     # FOV = this values * PI
     humans.FOV = 2.
 
@@ -64,22 +64,24 @@ class Config(object):
 
     humans.random_policy_changing = False
 
+    # robot settings
     robot = BaseConfig()
-    robot.visible = False # the robot is visible to humans
-    # srnn for now
+    robot.visible = False  # the robot is visible to humans
+    # robot policy: srnn for now
     robot.policy = 'srnn'
-    robot.radius = 0.3
-    robot.v_pref = 1
-    robot.sensor = "coordinates"
-    # FOV = this values * PI
+    robot.radius = 0.3  # radius of the robot
+    robot.v_pref = 1  # max velocity of the robot
+    # robot FOV = this values * PI
     robot.FOV = 2.
 
+    # add noise to observation or not
     noise = BaseConfig()
     noise.add_noise = False
     # uniform, gaussian
     noise.type = "uniform"
     noise.magnitude = 0.1
 
+    # robot action type
     action_space = BaseConfig()
     # holonomic or unicycle
     action_space.kinematics = "holonomic"
@@ -91,13 +93,13 @@ class Config(object):
     orca.time_horizon = 5
     orca.time_horizon_obst = 5
 
-    # social force
+    # config for social force
     sf = BaseConfig()
     sf.A = 2.
     sf.B = 1
     sf.KI = 1
 
-    # ppo
+    # cofig for RL ppo
     ppo = BaseConfig()
     ppo.num_mini_batch = 2  # number of batches for ppo
     ppo.num_steps = 30  # number of forward steps

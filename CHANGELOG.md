@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2021-11-19
+### Changed
+- Added comments in config.py
+
+### Removed
+- Redundant configs that are never used in config.py
+
 ## 2021-07-13
 ### Added
 - unicycle example model

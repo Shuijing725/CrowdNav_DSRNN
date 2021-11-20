@@ -18,7 +18,6 @@ class Agent(object):
         self.v_pref = subconfig.v_pref
         self.radius = subconfig.radius
         self.policy = policy_factory[subconfig.policy](config)
-        self.sensor = subconfig.sensor
         self.FOV = np.pi * subconfig.FOV
         # for humans: we only have holonomic kinematics; for robot: depend on config
         self.kinematics = 'holonomic' if section == 'humans' else config.action_space.kinematics

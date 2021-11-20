@@ -41,8 +41,8 @@ Details of the simulation framework can be found
 
 ### Change configurations
 1. Environment configurations and training hyperparameters: modify `crowd_nav/configs/config.py`
-- For FoV environment (left in the figure below): change the value of `robot.FOV`
-- For Group environment (right in the figure below): set `sim.group_human` to `True`
+- For FoV environment (left in the figure below): change the value of `robot.FOV` in `config.py`
+- For Group environment (right in the figure below): set `sim.group_human` to `True` in `config.py`
 
 <img src="/figures/FOV_env.png" height="270" /> <img src="/figures/group_env.png" height="270" />
 
@@ -54,9 +54,11 @@ Details of the simulation framework can be found
 python train.py 
 ```
 
-2. Test policies.   
-There are two example model weights for each type of robot kinematics:  
-`data/example_model/checkpoints/27776.pt` and `data/example_model_unicycle/checkpoints/55554.pt`.
+2. Test policies.  
+Please modify the test arguments in the begining of `test.py`.     
+We provide two trained example weights for each type of robot kinematics:  
+    - Holonomic: `data/example_model/checkpoints/27776.pt` 
+    - Unicycle: `data/example_model_unicycle/checkpoints/55554.pt`  
 ```
 python test.py 
 ```
@@ -79,8 +81,9 @@ If you find the code or the paper useful for your research, please cite our pape
 @inproceedings{liu2020decentralized,
   title={Decentralized Structural-RNN for Robot Crowd Navigation with Deep Reinforcement Learning},
   author={Liu, Shuijing and Chang, Peixin and Liang, Weihang and Chakraborty, Neeloy and Driggs-Campbell, Katherine},
-  booktitle={International Conference on Robotics and Automation (ICRA)},
-  year={2021}
+  booktitle={IEEE International Conference on Robotics and Automation (ICRA)},
+  year={2021},
+  pages={3517-3524}
 }
 ```
 
@@ -98,3 +101,6 @@ Part of the code is based on the following repositories:
 
 [3] A. Vemula, K. Muelling, and J. Oh, “Social attention: Modeling attention in human crowds,” in IEEE international Conference on Robotics and Automation (ICRA), 2018, pp. 1–7.
 (Github: https://github.com/jeanoh/big)
+
+## Contact
+If you have any questions or find any bugs, please feel free to open an issue or pull request.

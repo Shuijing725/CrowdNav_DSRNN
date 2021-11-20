@@ -28,9 +28,6 @@ class Config(object):
 
     sim = BaseConfig()
     sim.render = False # show GUI for visualization
-    sim.train_val_sim = "circle_crossing"
-    sim.test_sim = "circle_crossing"
-    sim.square_width = 10
     sim.circle_radius = 6
     sim.human_num = 5
     # Group environment: set to true; FoV environment: false
@@ -42,7 +39,6 @@ class Config(object):
     humans.policy = "orca"
     humans.radius = 0.3
     humans.v_pref = 1
-    humans.sensor = "coordinates"
     # FOV = this values * PI
     humans.FOV = 2.
 
@@ -70,7 +66,6 @@ class Config(object):
     robot.policy = 'srnn'
     robot.radius = 0.3
     robot.v_pref = 1
-    robot.sensor = "coordinates"
     # FOV = this values * PI
     robot.FOV = 2.
 
