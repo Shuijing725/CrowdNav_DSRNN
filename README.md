@@ -17,19 +17,22 @@ We successfully transfer the policy learned in the simulator to a real-world Tur
 
 
 ## Setup
-1. Install the required python package
+1. Install Python3.6 (The code may work with other versions of Python, but 3.6 is highly recommended).
+2. Install the required python package using pip or conda. For pip, use the following command:  
 ```
 pip install -r requirements.txt
 ```
+For conda, please install each package in `requirements.txt` into your conda environment manually and 
+follow the instructions on the anaconda website.  
 
-2. Install [OpenAI Baselines](https://github.com/openai/baselines#installation) 
+3. Install [OpenAI Baselines](https://github.com/openai/baselines#installation).   
 ```
 git clone https://github.com/openai/baselines.git
 cd baselines
 pip install -e .
 ```
 
-3. Install [Python-RVO2](https://github.com/sybrenstuvel/Python-RVO2) library
+4. Install [Python-RVO2](https://github.com/sybrenstuvel/Python-RVO2) library.  
 
 
 ## Getting started
