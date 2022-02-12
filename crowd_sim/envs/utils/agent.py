@@ -124,6 +124,8 @@ class Agent(object):
         self.vx = velocity[0]
         self.vy = velocity[1]
 
+    def set_policy(self, policy):
+        self.policy = policy
 
     @abc.abstractmethod
     def act(self, ob):

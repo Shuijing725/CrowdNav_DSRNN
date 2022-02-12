@@ -58,6 +58,7 @@ class ORCA(Policy):
         self.radius = None
         self.max_speed = 1 # the ego agent assumes that all other agents have this max speed
         self.sim = None
+        self.time_step = config.env.time_step
 
 
     def predict(self, state):
