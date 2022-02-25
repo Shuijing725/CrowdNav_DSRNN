@@ -1,5 +1,3 @@
-import numpy as np
-
 
 class BaseConfig(object):
     def __init__(self):
@@ -145,6 +143,6 @@ class Config(object):
     training.num_processes = 12 # how many training CPU processes to use
     training.output_dir = 'data/dummy'  # the saving directory for train.py
     training.resume = False  # resume training from an existing checkpoint or not
-    training.load_path = None  # if resume = True, load from the following checkpoint
+    training.load_path = 'data/example_model/checkpoints/27776.pt'  # if resume = True, load from the following checkpoint
     training.overwrite = True  # whether to overwrite the output directory in training
     training.num_threads = 1  # number of threads used for intraop parallelism on CPU
