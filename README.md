@@ -4,6 +4,9 @@ For more details, please refer to the [project website](https://sites.google.com
 [arXiv preprint](https://arxiv.org/abs/2011.04820).
 For experiment demonstrations, please refer to the [youtube video](https://youtu.be/bYO-1IAjzgY).
 
+**Please check out our more recent works in the following links:**
+- [Intention Aware Robot Crowd Navigation with Attention-Based Interaction Graph](https://github.com/Shuijing725/CrowdNav_Prediction_AttnGraph)
+- [Occlusion-Aware Crowd Navigation Using People as Sensors](https://github.com/yejimun/PaS_CrowdNav)
 
 ## Abstract
 Safe and efficient navigation through human crowds is an essential capability for mobile robots. 
