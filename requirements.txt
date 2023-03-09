@@ -2,6 +2,6 @@ numpy
 pandas
 pytorch>=1.5.0,<=1.7.1
 torchvision
-gym
+gym >= 0.15.7
 tensorflow
 matplotlib
