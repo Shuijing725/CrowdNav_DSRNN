@@ -1,3 +1,6 @@
 .idea/
 *.pyc 
 **/__pycache__
+
+save_dict.py
+modifications_list.txt
