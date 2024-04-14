@@ -7,6 +7,7 @@ For experiment demonstrations, please refer to the [youtube video](https://youtu
 **Please check out our more recent works in the following links:**
 - [Intention Aware Robot Crowd Navigation with Attention-Based Interaction Graph](https://github.com/Shuijing725/CrowdNav_Prediction_AttnGraph) (with [Sim2Real](https://github.com/Shuijing725/CrowdNav_Sim2Real_Turtlebot))
 - [Occlusion-Aware Crowd Navigation Using People as Sensors](https://github.com/yejimun/PaS_CrowdNav)
+- [My curated paper list for robot social navigation](https://github.com/Shuijing725/awesome-robot-social-navigation) (It is under active development) 
 
 ## Abstract
 Safe and efficient navigation through human crowds is an essential capability for mobile robots. 
