@@ -5,6 +5,7 @@ For more details, please refer to the [project website](https://sites.google.com
 For experiment demonstrations, please refer to the [youtube video](https://youtu.be/bYO-1IAjzgY).
 
 **Please check out our more recent works in the following links:**
+- [HEIGHT: Heterogeneous Interaction Graph Transformer for Robot Navigation in Crowded and Constrained Environments](https://github.com/Shuijing725/CrowdNav_HEIGHT)
 - [Intention Aware Robot Crowd Navigation with Attention-Based Interaction Graph](https://github.com/Shuijing725/CrowdNav_Prediction_AttnGraph) (with [Sim2Real](https://github.com/Shuijing725/CrowdNav_Sim2Real_Turtlebot))
 - [Occlusion-Aware Crowd Navigation Using People as Sensors](https://github.com/yejimun/PaS_CrowdNav)
 - [My curated paper list for robot social navigation](https://github.com/Shuijing725/awesome-robot-social-navigation) (It is under active development) 
