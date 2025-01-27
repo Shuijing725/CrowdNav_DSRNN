@@ -3,9 +3,9 @@ This repository contains the codes for our paper titled "Decentralized Structura
 [[Website]](https://sites.google.com/view/crowdnav-ds-rnn/home) [[Demo video]](https://youtu.be/bYO-1IAjzgY) [[arXiv]](https://arxiv.org/abs/2011.04820) [[Paper]](https://ieeexplore.ieee.org/document/9561595) [[Presentation video]](https://www.youtube.com/watch?v=FRWxJroI-vg) [[Poster]](https://drive.google.com/file/d/1VrZbPcI0q68Z0eaemcloeT0JrUM1_rrZ/view) [[Slides]](https://drive.google.com/file/d/1D3_CftMDWHDq-hejVUtH1f1DhZfTzVu6/view)
 
 **Please check out our more recent works in the following links:**
-- [HEIGHT: Heterogeneous Interaction Graph Transformer for Robot Navigation in Crowded and Constrained Environments](https://github.com/Shuijing725/CrowdNav_HEIGHT)
-- [Intention Aware Robot Crowd Navigation with Attention-Based Interaction Graph](https://github.com/Shuijing725/CrowdNav_Prediction_AttnGraph) (with [Sim2Real](https://github.com/Shuijing725/CrowdNav_Sim2Real_Turtlebot))
-- [Occlusion-Aware Crowd Navigation Using People as Sensors](https://github.com/yejimun/PaS_CrowdNav)
+- [HEIGHT: Heterogeneous Interaction Graph Transformer for Robot Navigation in Crowded and Constrained Environments](https://github.com/Shuijing725/CrowdNav_HEIGHT), arXiv 2024
+- [Intention Aware Robot Crowd Navigation with Attention-Based Interaction Graph](https://github.com/Shuijing725/CrowdNav_Prediction_AttnGraph), ICRA 2023(with [Sim2Real](https://github.com/Shuijing725/CrowdNav_Sim2Real_Turtlebot))
+- [Occlusion-Aware Crowd Navigation Using People as Sensors](https://github.com/yejimun/PaS_CrowdNav), ICRA 2023
 - [My curated paper list for robot social navigation](https://github.com/Shuijing725/awesome-robot-social-navigation) (It is under active development) 
 
 ## Abstract
