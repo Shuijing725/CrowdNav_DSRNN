@@ -1,8 +1,6 @@
 # DSRNN_CrowdNav
-This repository contains the codes for our paper titled "Decentralized Structural-RNN for Robot Crowd Navigation with Deep Reinforcement Learning" in ICRA 2021. 
-For more details, please refer to the [project website](https://sites.google.com/illinois.edu/crowdnav-dsrnn/home) and 
-[arXiv preprint](https://arxiv.org/abs/2011.04820).
-For experiment demonstrations, please refer to the [youtube video](https://youtu.be/bYO-1IAjzgY).
+This repository contains the codes for our paper titled "Decentralized Structural-RNN for Robot Crowd Navigation with Deep Reinforcement Learning" in ICRA 2021.  
+[[Website]](https://sites.google.com/view/crowdnav-ds-rnn/home) [[Demo video]](https://youtu.be/bYO-1IAjzgY) [[arXiv]](https://arxiv.org/abs/2011.04820) [[Paper]](https://ieeexplore.ieee.org/document/9561595) [[Presentation video]](https://www.youtube.com/watch?v=FRWxJroI-vg) [[Poster]](https://drive.google.com/file/d/1VrZbPcI0q68Z0eaemcloeT0JrUM1_rrZ/view) [[Slides]](https://drive.google.com/file/d/1D3_CftMDWHDq-hejVUtH1f1DhZfTzVu6/view)
 
 **Please check out our more recent works in the following links:**
 - [HEIGHT: Heterogeneous Interaction Graph Transformer for Robot Navigation in Crowded and Constrained Environments](https://github.com/Shuijing725/CrowdNav_HEIGHT)
